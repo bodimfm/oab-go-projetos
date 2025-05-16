@@ -1,11 +1,63 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Merriweather:wght@400;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
   --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
+  --background-start-rgb: 245, 245, 245;
   --background-end-rgb: 255, 255, 255;
+  --oab-red: 193, 39, 45;
+  --oab-burgundy: 140, 28, 33;
+}
+
+@layer base {
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif font-bold;
+  }
+  
+  h1 {
+    @apply text-3xl md:text-4xl;
+  }
+  
+  h2 {
+    @apply text-2xl md:text-3xl;
+  }
+  
+  h3 {
+    @apply text-xl md:text-2xl;
+  }
+  
+  a {
+    @apply text-oab-red hover:text-oab-burgundy transition-colors;
+  }
+  
+  button {
+    @apply font-medium;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-oab-red hover:bg-oab-burgundy text-white font-medium py-2 px-6 rounded-md transition-colors;
+  }
+  
+  .btn-secondary {
+    @apply bg-white hover:bg-gray-100 text-oab-red border border-oab-red font-medium py-2 px-6 rounded-md transition-colors;
+  }
+  
+  .card {
+    @apply bg-white p-6 rounded-lg shadow-md border-t-4 border-oab-red;
+  }
+  
+  .form-input {
+    @apply w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-oab-red;
+  }
+  
+  .form-label {
+    @apply block text-gray-700 font-medium mb-2;
+  }
 }
 
 body {
@@ -16,4 +68,5 @@ body {
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
+  @apply font-sans;
 } 

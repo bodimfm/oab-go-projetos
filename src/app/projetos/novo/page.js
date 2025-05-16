@@ -50,22 +50,30 @@ export default function NovoProjeto() {
   };
   
   const handleComissaoSelect = (comissaoSelecionada) => {
-    if (!comissaoSelecionada) return;
+    if (!comissaoSelecionada || !comissaoSelecionada.id || !comissaoSelecionada.nome) {
+      console.error('Comissão selecionada inválida:', comissaoSelecionada);
+      return;
+    }
     
-    // Verifica se a comissão já está selecionada
-    if (comissoesSelecionadas.some(c => c.comissao_id === comissaoSelecionada.id)) {
+    // Verificar se a comissão já está selecionada
+    if (comissoesSelecionadas && Array.isArray(comissoesSelecionadas) && 
+        comissoesSelecionadas.some(c => c.comissao_id === comissaoSelecionada.id)) {
       alert('Esta comissão já foi adicionada ao projeto.');
       return;
     }
     
-    setComissoesSelecionadas([
-      ...comissoesSelecionadas,
-      {
-        comissao_id: comissaoSelecionada.id,
-        nome: comissaoSelecionada.nome,
-        papel_comissao: 'participante'
-      }
-    ]);
+    // Inicializar o array se não existir
+    const comissoesAtualizadas = Array.isArray(comissoesSelecionadas) 
+      ? [...comissoesSelecionadas] 
+      : [];
+    
+    comissoesAtualizadas.push({
+      comissao_id: comissaoSelecionada.id,
+      nome: comissaoSelecionada.nome,
+      papel_comissao: 'participante'
+    });
+    
+    setComissoesSelecionadas(comissoesAtualizadas);
   };
   
   const handlePapelChange = (comissaoId, papel) => {
@@ -97,10 +105,24 @@ export default function NovoProjeto() {
       return;
     }
     
-    if (comissoesSelecionadas.length === 0) {
+    if (!comissoesSelecionadas || !Array.isArray(comissoesSelecionadas) || comissoesSelecionadas.length === 0) {
       alert('Selecione pelo menos uma comissão para o projeto.');
       return;
     }
+    
+    // Verificar formato das comissões
+    const comissoesValidas = comissoesSelecionadas.filter(c => 
+      c && c.comissao_id && typeof c.comissao_id === 'string' && c.papel_comissao
+    );
+    
+    if (comissoesValidas.length === 0) {
+      alert('Nenhuma comissão válida selecionada. Adicione pelo menos uma comissão.');
+      return;
+    }
+    
+    // Adicionar logs para depuração
+    console.log('Comissões selecionadas:', comissoesSelecionadas);
+    console.log('Comissões válidas:', comissoesValidas);
     
     // Processar tags
     const tags = formData.tags
@@ -114,11 +136,21 @@ export default function NovoProjeto() {
       setLoading(true);
       setErro(null);
       
-      await api.criarProjeto({
+      // Criar objeto de dados com formato adequado para a API
+      const projetoData = {
         ...formData,
-        comissoes: comissoesSelecionadas,
+        comissoes: comissoesValidas.map(c => ({
+          comissao_id: c.comissao_id,
+          papel_comissao: c.papel_comissao
+        })),
         tags
-      });
+      };
+      
+      console.log('Enviando dados do projeto:', projetoData);
+      
+      const response = await api.criarProjeto(projetoData);
+      
+      console.log('Resposta da API:', response);
       
       alert('Projeto criado com sucesso!');
       router.push('/projetos');
@@ -135,26 +167,29 @@ export default function NovoProjeto() {
       <div className="mb-6">
         <Link
           href="/projetos"
-          className="text-blue-600 hover:text-blue-800 mb-2 inline-block"
+          className="flex items-center text-oab-red hover:text-oab-burgundy mb-2 inline-block"
         >
-          ← Voltar para Projetos
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Voltar para Projetos
         </Link>
-        <h1 className="text-3xl font-bold text-gray-800">Novo Projeto</h1>
-        <p className="text-gray-600 mt-1">
+        <h1 className="text-3xl font-bold text-oab-gray-800 mb-2">Novo Projeto</h1>
+        <p className="text-oab-gray-600 mt-1">
           Preencha o formulário abaixo para criar um novo projeto
         </p>
       </div>
       
       {erro && (
-        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
+        <div className="bg-red-50 border-l-4 border-oab-red text-red-700 p-4 mb-6" role="alert">
           <p>{erro}</p>
         </div>
       )}
       
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md">
+      <form onSubmit={handleSubmit} className="card">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div className="col-span-1 md:col-span-2">
-            <label htmlFor="nome" className="block text-gray-700 font-medium mb-2">
+            <label htmlFor="nome" className="form-label">
               Nome do Projeto *
             </label>
             <input
@@ -163,13 +198,13 @@ export default function NovoProjeto() {
               name="nome"
               value={formData.nome}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="form-input"
               required
             />
           </div>
           
           <div className="col-span-1 md:col-span-2">
-            <label htmlFor="descricao" className="block text-gray-700 font-medium mb-2">
+            <label htmlFor="descricao" className="form-label">
               Descrição
             </label>
             <textarea
@@ -178,12 +213,12 @@ export default function NovoProjeto() {
               value={formData.descricao}
               onChange={handleChange}
               rows="3"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="form-input"
             />
           </div>
           
           <div>
-            <label htmlFor="objetivos" className="block text-gray-700 font-medium mb-2">
+            <label htmlFor="objetivos" className="form-label">
               Objetivos
             </label>
             <textarea
@@ -192,12 +227,12 @@ export default function NovoProjeto() {
               value={formData.objetivos}
               onChange={handleChange}
               rows="3"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="form-input"
             />
           </div>
           
           <div>
-            <label htmlFor="resultados_esperados" className="block text-gray-700 font-medium mb-2">
+            <label htmlFor="resultados_esperados" className="form-label">
               Resultados Esperados
             </label>
             <textarea
@@ -206,12 +241,12 @@ export default function NovoProjeto() {
               value={formData.resultados_esperados}
               onChange={handleChange}
               rows="3"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="form-input"
             />
           </div>
           
           <div>
-            <label htmlFor="publico_alvo" className="block text-gray-700 font-medium mb-2">
+            <label htmlFor="publico_alvo" className="form-label">
               Público Alvo
             </label>
             <input
@@ -220,12 +255,12 @@ export default function NovoProjeto() {
               name="publico_alvo"
               value={formData.publico_alvo}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="form-input"
             />
           </div>
           
           <div>
-            <label htmlFor="status" className="block text-gray-700 font-medium mb-2">
+            <label htmlFor="status" className="form-label">
               Status *
             </label>
             <select
@@ -233,7 +268,7 @@ export default function NovoProjeto() {
               name="status"
               value={formData.status}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="form-input"
               required
             >
               <option value="planejamento">Planejamento</option>
@@ -244,7 +279,7 @@ export default function NovoProjeto() {
           </div>
           
           <div>
-            <label htmlFor="data_inicio" className="block text-gray-700 font-medium mb-2">
+            <label htmlFor="data_inicio" className="form-label">
               Data de Início
             </label>
             <input
@@ -253,12 +288,12 @@ export default function NovoProjeto() {
               name="data_inicio"
               value={formData.data_inicio}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="form-input"
             />
           </div>
           
           <div>
-            <label htmlFor="data_fim_prevista" className="block text-gray-700 font-medium mb-2">
+            <label htmlFor="data_fim_prevista" className="form-label">
               Data de Conclusão Prevista
             </label>
             <input
@@ -267,12 +302,12 @@ export default function NovoProjeto() {
               name="data_fim_prevista"
               value={formData.data_fim_prevista}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="form-input"
             />
           </div>
           
           <div className="col-span-1 md:col-span-2">
-            <label htmlFor="tags" className="block text-gray-700 font-medium mb-2">
+            <label htmlFor="tags" className="form-label">
               Tags (separadas por vírgula)
             </label>
             <input
@@ -282,13 +317,13 @@ export default function NovoProjeto() {
               value={formData.tags}
               onChange={handleChange}
               placeholder="Ex: direito digital, educação, evento"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="form-input"
             />
           </div>
         </div>
         
         <div className="mb-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Comissões Participantes *</h2>
+          <h2 className="text-xl font-bold text-oab-gray-800 mb-4 border-b border-gray-200 pb-2">Comissões Participantes *</h2>
           <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
             <div className="flex-1">
               <ComissaoAutocomplete
@@ -298,7 +333,7 @@ export default function NovoProjeto() {
                 placeholder="Digite para buscar uma comissão..."
               />
               {loadingComissoes && (
-                <p className="text-sm text-gray-500 mt-1">Carregando comissões...</p>
+                <p className="text-sm text-oab-gray-500 mt-1">Carregando comissões...</p>
               )}
             </div>
           </div>
@@ -307,14 +342,14 @@ export default function NovoProjeto() {
             <div className="mt-4">
               <ul className="border rounded-md divide-y">
                 {comissoesSelecionadas && comissoesSelecionadas.map((comissao) => (
-                  <li key={comissao.comissao_id} className="p-4 flex flex-col md:flex-row md:items-center md:justify-between">
-                    <div className="font-medium">{comissao.nome}</div>
+                  <li key={comissao.comissao_id} className="p-4 flex flex-col md:flex-row md:items-center md:justify-between hover:bg-oab-gray-50">
+                    <div className="font-medium text-oab-gray-800">{comissao.nome}</div>
                     <div className="flex items-center space-x-4 mt-2 md:mt-0">
                       <div>
                         <select
                           value={comissao.papel_comissao}
                           onChange={(e) => handlePapelChange(comissao.comissao_id, e.target.value)}
-                          className="px-3 py-1 border border-gray-300 rounded-md text-sm"
+                          className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-oab-red"
                         >
                           <option value="lider">Líder</option>
                           <option value="participante">Participante</option>
@@ -324,9 +359,11 @@ export default function NovoProjeto() {
                       <button
                         type="button"
                         onClick={() => removerComissao(comissao.comissao_id)}
-                        className="text-red-600 hover:text-red-800"
+                        className="text-oab-red hover:text-oab-burgundy"
                       >
-                        Remover
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
                       </button>
                     </div>
                   </li>
@@ -334,21 +371,21 @@ export default function NovoProjeto() {
               </ul>
             </div>
           ) : (
-            <p className="text-gray-500 mt-4">Nenhuma comissão selecionada</p>
+            <p className="text-oab-gray-500 mt-4 bg-oab-gray-50 p-4 border rounded-md">Nenhuma comissão selecionada</p>
           )}
         </div>
         
-        <div className="flex justify-end space-x-4">
+        <div className="flex justify-end space-x-4 border-t border-gray-200 pt-6 mt-6">
           <Link
             href="/projetos"
-            className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition-colors"
+            className="btn-secondary"
           >
             Cancelar
           </Link>
           <button
             type="submit"
             disabled={loading}
-            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors disabled:bg-blue-400"
+            className="btn-primary"
           >
             {loading ? 'Salvando...' : 'Salvar Projeto'}
           </button>

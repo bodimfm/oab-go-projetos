@@ -1,12 +1,20 @@
+'use client';
+
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useAuth } from '../../contexts/AuthContext';
-import { useRouter } from 'next/router';
+import { useRouter, usePathname } from 'next/navigation';
 
 export default function Header() {
-  const { isAuthenticated, user, logout } = useAuth();
+  const auth = useAuth();
+  const isAuthenticated = auth?.isAuthenticated || false;
+  const user = auth?.user || null;
+  const logout = auth?.logout || (() => {});
+  
   const [menuOpen, setMenuOpen] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -18,31 +26,64 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-blue-800 text-white shadow-md">
+    <header className="bg-white shadow-md">
+      {/* Barra superior com contatos */}
+      <div className="bg-oab-red text-white py-1 text-sm">
+        <div className="container mx-auto px-4 flex justify-between items-center">
+          <div className="hidden md:flex items-center space-x-4">
+            <a href="tel:+556232382000" className="flex items-center hover:text-white">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+              </svg>
+              <span>(62) 3238-2000</span>
+            </a>
+            <a href="mailto:contato@oabgo.org.br" className="flex items-center hover:text-white">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              <span>contato@oabgo.org.br</span>
+            </a>
+          </div>
+          {isAuthenticated && (
+            <div className="text-xs">
+              <span>Olá, {user?.nome_completo || 'Usuário'}</span>
+            </div>
+          )}
+        </div>
+      </div>
+      
+      {/* Menu principal */}
       <div className="container mx-auto px-4 py-3">
         <div className="flex justify-between items-center">
           {/* Logo e Nome */}
           <Link href="/" className="flex items-center space-x-3">
-            <img
-              src="/images/logo-oabgo.png"
-              alt="OAB-GO"
-              className="h-10 w-auto bg-white p-1 rounded"
-            />
-            <span className="font-bold text-xl">OAB-GO Projetos</span>
+            <div className="relative h-12 w-16 flex items-center justify-center bg-white">
+              <Image
+                src="/images/logo-oabgo.png"
+                alt="Logo OAB-GO"
+                width={64}
+                height={48}
+                className="object-contain"
+              />
+            </div>
+            <div className="flex flex-col">
+              <span className="font-serif font-bold text-oab-red">OAB-GO</span>
+              <span className="text-oab-gray-600 text-sm">Sistema de Projetos das Comissões</span>
+            </div>
           </Link>
 
           {/* Menu para Desktop */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link href="/" className={`hover:text-blue-200 ${router.pathname === '/' ? 'text-blue-200 font-medium' : ''}`}>
+            <Link href="/" className={`hover:text-oab-red ${pathname === '/' ? 'text-oab-red font-medium' : 'text-oab-gray-700'}`}>
               Início
             </Link>
-            <Link href="/projetos" className={`hover:text-blue-200 ${router.pathname.startsWith('/projetos') ? 'text-blue-200 font-medium' : ''}`}>
+            <Link href="/projetos" className={`hover:text-oab-red ${pathname.startsWith('/projetos') ? 'text-oab-red font-medium' : 'text-oab-gray-700'}`}>
               Projetos
             </Link>
-            <Link href="/membros" className={`hover:text-blue-200 ${router.pathname.startsWith('/membros') ? 'text-blue-200 font-medium' : ''}`}>
+            <Link href="/membros" className={`hover:text-oab-red ${pathname.startsWith('/membros') ? 'text-oab-red font-medium' : 'text-oab-gray-700'}`}>
               Membros
             </Link>
-            <Link href="/buscar" className={`hover:text-blue-200 ${router.pathname.startsWith('/buscar') ? 'text-blue-200 font-medium' : ''}`}>
+            <Link href="/buscar" className={`hover:text-oab-red ${pathname.startsWith('/buscar') ? 'text-oab-red font-medium' : 'text-oab-gray-700'}`}>
               Buscar
             </Link>
 
@@ -50,12 +91,25 @@ export default function Header() {
               <div className="relative ml-3">
                 <button
                   type="button"
-                  className="flex items-center space-x-2 text-white hover:text-blue-200 focus:outline-none"
+                  className="flex items-center space-x-2 text-oab-gray-700 hover:text-oab-red focus:outline-none"
                   onClick={toggleMenu}
                   aria-expanded={menuOpen}
                   aria-haspopup="true"
                 >
-                  <span>{user?.nome_completo || 'Usuário'}</span>
+                  <svg
+                    className="h-6 w-6"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    />
+                  </svg>
                   <svg
                     className="h-5 w-5"
                     xmlns="http://www.w3.org/2000/svg"
@@ -81,14 +135,14 @@ export default function Header() {
                     >
                       <Link
                         href="/perfil"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-oab-red hover:text-white"
                         role="menuitem"
                         onClick={() => setMenuOpen(false)}
                       >
                         Meu Perfil
                       </Link>
                       <button
-                        className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        className="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-oab-red hover:text-white"
                         role="menuitem"
                         onClick={handleLogout}
                       >
@@ -101,7 +155,7 @@ export default function Header() {
             ) : (
               <Link
                 href="/login"
-                className="bg-white text-blue-800 hover:bg-blue-100 px-4 py-2 rounded-md font-medium transition-colors"
+                className="btn-primary"
               >
                 Entrar
               </Link>
@@ -111,7 +165,7 @@ export default function Header() {
           {/* Menu Hamburger para Mobile */}
           <button
             type="button"
-            className="md:hidden text-white hover:text-blue-200 focus:outline-none"
+            className="md:hidden text-oab-gray-700 hover:text-oab-red focus:outline-none"
             onClick={toggleMenu}
           >
             <svg
@@ -142,32 +196,32 @@ export default function Header() {
 
         {/* Menu para Mobile */}
         {menuOpen && (
-          <nav className="md:hidden bg-blue-700 mt-3 rounded-lg p-4">
+          <nav className="md:hidden bg-white mt-3 rounded-lg p-4 shadow-lg border border-gray-200">
             <div className="flex flex-col space-y-4">
               <Link
                 href="/"
-                className={`hover:text-blue-200 ${router.pathname === '/' ? 'text-blue-200 font-medium' : ''}`}
+                className={`hover:text-oab-red ${pathname === '/' ? 'text-oab-red font-medium' : 'text-oab-gray-700'}`}
                 onClick={() => setMenuOpen(false)}
               >
                 Início
               </Link>
               <Link
                 href="/projetos"
-                className={`hover:text-blue-200 ${router.pathname.startsWith('/projetos') ? 'text-blue-200 font-medium' : ''}`}
+                className={`hover:text-oab-red ${pathname.startsWith('/projetos') ? 'text-oab-red font-medium' : 'text-oab-gray-700'}`}
                 onClick={() => setMenuOpen(false)}
               >
                 Projetos
               </Link>
               <Link
                 href="/membros"
-                className={`hover:text-blue-200 ${router.pathname.startsWith('/membros') ? 'text-blue-200 font-medium' : ''}`}
+                className={`hover:text-oab-red ${pathname.startsWith('/membros') ? 'text-oab-red font-medium' : 'text-oab-gray-700'}`}
                 onClick={() => setMenuOpen(false)}
               >
                 Membros
               </Link>
               <Link
                 href="/buscar"
-                className={`hover:text-blue-200 ${router.pathname.startsWith('/buscar') ? 'text-blue-200 font-medium' : ''}`}
+                className={`hover:text-oab-red ${pathname.startsWith('/buscar') ? 'text-oab-red font-medium' : 'text-oab-gray-700'}`}
                 onClick={() => setMenuOpen(false)}
               >
                 Buscar
@@ -175,16 +229,16 @@ export default function Header() {
 
               {isAuthenticated ? (
                 <>
-                  <hr className="border-blue-600" />
+                  <hr className="border-gray-200" />
                   <Link
                     href="/perfil"
-                    className="hover:text-blue-200"
+                    className="text-oab-gray-700 hover:text-oab-red"
                     onClick={() => setMenuOpen(false)}
                   >
                     Meu Perfil
                   </Link>
                   <button
-                    className="text-left text-white hover:text-blue-200"
+                    className="text-left text-oab-gray-700 hover:text-oab-red"
                     onClick={handleLogout}
                   >
                     Sair
@@ -193,7 +247,7 @@ export default function Header() {
               ) : (
                 <Link
                   href="/login"
-                  className="bg-white text-blue-800 hover:bg-blue-100 px-4 py-2 rounded-md font-medium transition-colors text-center"
+                  className="btn-primary text-center mt-2"
                   onClick={() => setMenuOpen(false)}
                 >
                   Entrar

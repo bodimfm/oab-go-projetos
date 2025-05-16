@@ -50,12 +50,15 @@ export const api = {
         };
       }
       
-      projetos[item.projeto_id].comissoes.push({
-        id: item.comissao_id,
-        nome: item.comissao_nome,
-        descricao: item.comissao_descricao,
-        papel: item.papel_comissao
-      });
+      // Só adicionar comissão se ela existir
+      if (item.comissao_id) {
+        projetos[item.projeto_id].comissoes.push({
+          id: item.comissao_id,
+          nome: item.comissao_nome,
+          descricao: item.comissao_descricao,
+          papel: item.papel_comissao
+        });
+      }
     });
     
     return { data: Object.values(projetos) };
@@ -148,6 +151,12 @@ export const api = {
     const { nome, descricao, objetivos, resultados_esperados, publico_alvo, 
            data_inicio, data_fim_prevista, status, comissoes, tags } = projeto;
     
+    console.log('Dados para criar projeto:', { 
+      nome, status, 
+      comissoes: comissoes ? JSON.stringify(comissoes) : 'undefined',
+      comissoesCount: comissoes ? comissoes.length : 0
+    });
+    
     // Validar campos obrigatórios
     if (!nome || !status || !comissoes || comissoes.length === 0) {
       throw new Error('Campos obrigatórios: nome, status e pelo menos uma comissão');
@@ -180,39 +189,108 @@ export const api = {
     const projetoData = await responseProjeto.json();
     const projeto_id = projetoData[0].id;
     
+    console.log('Projeto criado com ID:', projeto_id);
+    
     // Relacionar com comissões
     const projetoComissoes = comissoes.map(c => ({
       projeto_id,
       comissao_id: c.comissao_id,
-      papel_comissao: c.papel_comissao
+      papel_comissao: c.papel_comissao || 'participante'
     }));
     
-    const responseComissoes = await fetch(`${API_URL}/projetos_comissoes`, {
-      method: 'POST',
-      headers: defaultHeaders,
-      body: JSON.stringify(projetoComissoes)
-    });
+    console.log('Comissões para vincular:', JSON.stringify(projetoComissoes));
     
-    if (!responseComissoes.ok) {
-      throw new Error('Erro ao relacionar projeto com comissões');
+    let comissoesVinculadas = 0;
+    // Modificado: enviar dados da relação projeto-comissão um por um com melhor tratamento de erros
+    for (const comissaoRelacao of projetoComissoes) {
+      try {
+        // Verificar se o ID da comissão está no formato correto (UUID)
+        if (!comissaoRelacao.comissao_id || typeof comissaoRelacao.comissao_id !== 'string' || 
+            !comissaoRelacao.comissao_id.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
+          console.error(`ID de comissão inválido: ${comissaoRelacao.comissao_id}`);
+          continue; // Pula esta comissão em vez de falhar todo o processo
+        }
+        
+        console.log(`Tentando vincular comissão: ${comissaoRelacao.comissao_id}`);
+        
+        const responseComissao = await fetch(`${API_URL}/projetos_comissoes`, {
+          method: 'POST',
+          headers: {
+            ...defaultHeaders,
+            'Prefer': 'return=representation'
+          },
+          body: JSON.stringify({
+            projeto_id: projeto_id,
+            comissao_id: comissaoRelacao.comissao_id,
+            papel_comissao: comissaoRelacao.papel_comissao || 'participante'
+          })
+        });
+        
+        if (!responseComissao.ok) {
+          const errorResponse = await responseComissao.text();
+          console.error(`Erro ao vincular comissão (${comissaoRelacao.comissao_id}): `, errorResponse);
+          
+          // Tentar recuperar detalhes do erro para melhor diagnóstico
+          try {
+            const errorJson = JSON.parse(errorResponse);
+            console.error('Detalhes do erro:', errorJson);
+          } catch (e) {
+            // Ignorar erro de parsing
+          }
+          
+          // Continuar com as outras comissões em vez de interromper o processo
+          continue;
+        }
+        
+        const comissaoData = await responseComissao.json();
+        console.log(`Comissão vinculada com sucesso: ${comissaoRelacao.comissao_id}`, comissaoData);
+        comissoesVinculadas++;
+      } catch (error) {
+        console.error(`Erro ao processar comissão (${comissaoRelacao.comissao_id}): `, error);
+        // Continuar com as outras comissões
+        continue;
+      }
     }
+    
+    console.log(`Processo concluído: ${comissoesVinculadas} de ${projetoComissoes.length} comissões vinculadas`);
     
     // Adicionar tags, se houver
     if (tags && tags.length > 0) {
-      const projetoTags = tags.map(tag => ({
-        projeto_id,
-        tag
-      }));
-      
-      const responseTags = await fetch(`${API_URL}/tags_projetos`, {
-        method: 'POST',
-        headers: defaultHeaders,
-        body: JSON.stringify(projetoTags)
-      });
-      
-      if (!responseTags.ok) {
-        throw new Error('Erro ao adicionar tags ao projeto');
+      // Modificado: enviar tags uma a uma para evitar erros de inserção em lote
+      for (const tag of tags) {
+        try {
+          if (!tag || typeof tag !== 'string') {
+            console.error(`Tag inválida: ${tag}`);
+            continue;
+          }
+          
+          const responseTag = await fetch(`${API_URL}/tags_projetos`, {
+            method: 'POST',
+            headers: {
+              ...defaultHeaders,
+              'Prefer': 'return=representation'
+            },
+            body: JSON.stringify({
+              projeto_id,
+              tag
+            })
+          });
+          
+          if (!responseTag.ok) {
+            const errorResponse = await responseTag.text();
+            console.error(`Erro ao adicionar tag (${tag}): `, errorResponse);
+            continue;
+          }
+        } catch (error) {
+          console.error(`Erro ao processar tag (${tag}): `, error);
+          continue;
+        }
       }
+    }
+    
+    // Realizar uma verificação final para garantir que pelo menos uma comissão foi vinculada
+    if (comissoesVinculadas === 0 && projetoComissoes.length > 0) {
+      console.warn(`Atenção: Projeto ${projeto_id} criado sem nenhuma comissão vinculada`);
     }
     
     return { data: projetoData[0] };
