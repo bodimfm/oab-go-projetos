@@ -14,16 +14,18 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     // Verificar se há uma sessão salva no localStorage
-    const storedUser = localStorage.getItem('oabgo_user');
-    if (storedUser) {
-      try {
-        const userData = JSON.parse(storedUser);
-        setUser(userData);
-      } catch (e) {
-        localStorage.removeItem('oabgo_user');
+    if (typeof window !== 'undefined') {
+      const storedUser = localStorage.getItem('oabgo_user');
+      if (storedUser) {
+        try {
+          const userData = JSON.parse(storedUser);
+          setUser(userData);
+        } catch (e) {
+          localStorage.removeItem('oabgo_user');
+        }
       }
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
   const login = async (username, password) => {
@@ -35,12 +37,16 @@ export const AuthProvider = ({ children }) => {
       if (response.data.require_password_change) {
         // Redirecionar para a página de alteração de senha
         setUser(response.data);
-        localStorage.setItem('oabgo_user', JSON.stringify(response.data));
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('oabgo_user', JSON.stringify(response.data));
+        }
         router.push('/alterar-senha');
       } else {
         // Login normal
         setUser(response.data);
-        localStorage.setItem('oabgo_user', JSON.stringify(response.data));
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('oabgo_user', JSON.stringify(response.data));
+        }
         router.push('/');
       }
       
@@ -55,7 +61,9 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('oabgo_user');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('oabgo_user');
+    }
     router.push('/login');
   };
 
@@ -73,7 +81,9 @@ export const AuthProvider = ({ children }) => {
       // Atualizar o usuário no contexto e localStorage
       const updatedUser = { ...user, ...response.data, require_password_change: false };
       setUser(updatedUser);
-      localStorage.setItem('oabgo_user', JSON.stringify(updatedUser));
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('oabgo_user', JSON.stringify(updatedUser));
+      }
       
       return response;
     } catch (err) {
@@ -106,7 +116,9 @@ export const AuthProvider = ({ children }) => {
       
       // Armazenar usuário temporariamente para troca de senha
       setUser(response.data);
-      localStorage.setItem('oabgo_user', JSON.stringify(response.data));
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('oabgo_user', JSON.stringify(response.data));
+      }
       
       return response;
     } catch (err) {
@@ -151,4 +163,22 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export const useAuth = () => useContext(AuthContext); 
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    // Fallback para quando o contexto não está disponível (SSR)
+    return {
+      isAuthenticated: false,
+      user: null,
+      loading: false,
+      error: null,
+      login: () => {},
+      logout: () => {},
+      alterarSenha: () => {},
+      solicitarRecuperacao: () => {},
+      verificarToken: () => {},
+      cadastrarUsuario: () => {}
+    };
+  }
+  return context;
+}; 

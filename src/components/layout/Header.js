@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useAuth } from '../../contexts/AuthContext';
 import { useRouter, usePathname } from 'next/navigation';
 
@@ -58,7 +57,7 @@ export default function Header() {
           {/* Logo e Nome */}
           <Link href="/" className="flex items-center space-x-3">
             <div className="relative h-12 w-16 flex items-center justify-center bg-white">
-              <Image
+              <img
                 src="/images/logo-oabgo.png"
                 alt="Logo OAB-GO"
                 width={64}
