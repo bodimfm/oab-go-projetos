@@ -32,7 +32,14 @@ export default function DetalhesProjeto() {
       try {
         setLoadingSugestoes(true);
         const { data } = await api.getSugestoesIntegracao(params.id);
-        setSugestoes(data);
+        let extras = [];
+        if (typeof window !== 'undefined') {
+          const stored = localStorage.getItem(`sugestoesIntegracao_${params.id}`);
+          if (stored) {
+            try { extras = JSON.parse(stored); } catch (e) { extras = []; }
+          }
+        }
+        setSugestoes([...(extras || []), ...data]);
       } catch (error) {
         console.error('Erro ao carregar sugestões de integração:', error);
         // Não vamos mostrar erro para o usuário neste caso, apenas não mostraremos as sugestões

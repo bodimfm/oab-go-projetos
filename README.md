@@ -53,6 +53,7 @@ npm install
 ```
 NEXT_PUBLIC_SUPABASE_URL=https://qnsbjljmnflihwcovuwz.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFuc2JqbGptbmZsaWh3Y292dXd6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY5NjcyNjQsImV4cCI6MjA2MjU0MzI2NH0.UWGXOyL8J7e11W_CE3zIo5bn-5LwKQ1YtAS1V72DTtk
+OPENAI_API_KEY=sua-chave-da-openai
 ```
 
 4. Execute o servidor de desenvolvimento:

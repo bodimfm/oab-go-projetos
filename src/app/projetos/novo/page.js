@@ -23,11 +23,35 @@ export default function NovoProjeto() {
   
   const [comissoes, setComissoes] = useState([]);
   const [comissoesSelecionadas, setComissoesSelecionadas] = useState([]);
+  const [sugestoesIntegracao, setSugestoesIntegracao] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loadingComissoes, setLoadingComissoes] = useState(true);
   const [erro, setErro] = useState(null);
-  
+
   useEffect(() => {
+    // Preencher dados a partir de sugestão gerada, se houver
+    if (typeof window !== 'undefined') {
+      const sugestaoStr = sessionStorage.getItem('sugestaoProjeto');
+      if (sugestaoStr) {
+        try {
+          const sugestao = JSON.parse(sugestaoStr);
+          setFormData((prev) => ({
+            ...prev,
+            nome: sugestao.nome || '',
+            descricao: sugestao.descricao || '',
+            objetivos: sugestao.objetivos || '',
+            resultados_esperados: sugestao.resultados_esperados || '',
+            publico_alvo: sugestao.publico_alvo || '',
+            tags: sugestao.tags ? sugestao.tags.join(', ') : ''
+          }));
+          setSugestoesIntegracao(sugestao.integracoes || []);
+        } catch (e) {
+          console.error('Erro ao ler sugestão de projeto:', e);
+        }
+        sessionStorage.removeItem('sugestaoProjeto');
+      }
+    }
+
     const carregarComissoes = async () => {
       try {
         setLoadingComissoes(true);
@@ -151,9 +175,18 @@ export default function NovoProjeto() {
       const response = await api.criarProjeto(projetoData);
       
       console.log('Resposta da API:', response);
-      
+
+      if (sugestoesIntegracao && sugestoesIntegracao.length > 0) {
+        try {
+          localStorage.setItem(`sugestoesIntegracao_${response.data.id}`,
+            JSON.stringify(sugestoesIntegracao));
+        } catch (e) {
+          console.error('Erro ao salvar sugestões de integração:', e);
+        }
+      }
+
       alert('Projeto criado com sucesso!');
-      router.push('/projetos');
+      router.push(`/projetos/${response.data.id}`);
     } catch (error) {
       console.error('Erro ao criar projeto:', error);
       setErro(error.message || 'Ocorreu um erro ao criar o projeto. Tente novamente.');
