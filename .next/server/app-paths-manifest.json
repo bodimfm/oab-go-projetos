@@ -1,10 +1,7 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
-  "/membros/novo/page": "app/membros/novo/page.js",
-  "/buscar/page": "app/buscar/page.js",
-  "/projetos/novo/page": "app/projetos/novo/page.js",
-  "/membros/page": "app/membros/page.js",
-  "/projetos/page": "app/projetos/page.js",
   "/page": "app/page.js",
-  "/projetos/[id]/page": "app/projetos/[id]/page.js"
+  "/projetos/novo/page": "app/projetos/novo/page.js",
+  "/integracoes/page": "app/integracoes/page.js",
+  "/integracoes/nova/page": "app/integracoes/nova/page.js",
+  "/integracoes/[id]/page": "app/integracoes/[id]/page.js"
 }
