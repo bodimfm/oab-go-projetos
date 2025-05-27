@@ -20,7 +20,7 @@ export async function POST(request) {
       'Authorization': `Bearer ${apiKey}`
     },
     body: JSON.stringify({
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-4.1-mini"',
       messages: [
         { role: 'system', content: 'Você é um assistente que ajuda a criar projetos para as comissões da OAB-GO.' },
         { role: 'user', content: prompt }

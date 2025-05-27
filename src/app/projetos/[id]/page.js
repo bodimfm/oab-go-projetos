@@ -13,8 +13,14 @@ export default function DetalhesProjeto() {
   const [loading, setLoading] = useState(true);
   const [loadingSugestoes, setLoadingSugestoes] = useState(true);
   const [erro, setErro] = useState(null);
+  const [pageUrl, setPageUrl] = useState('');
 
   useEffect(() => {
+    // Capturar a URL atual para compartilhamento
+    if (typeof window !== 'undefined') {
+      setPageUrl(window.location.href);
+    }
+
     const carregarProjeto = async () => {
       try {
         setLoading(true);
@@ -258,6 +264,8 @@ export default function DetalhesProjeto() {
             )}
           </section>
         </div>
+      </div>
+
       </div>
     </div>
   );

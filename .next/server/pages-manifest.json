@@ -1,1 +1,9 @@
-{}
+{
+  "/_error": "pages/_error.js",
+  "/alterar-senha": "pages/alterar-senha.js",
+  "/_app": "pages/_app.js",
+  "/login": "pages/login.js",
+  "/cadastro": "pages/cadastro.js",
+  "/recuperar-senha": "pages/recuperar-senha.js",
+  "/_document": "pages/_document.js"
+}

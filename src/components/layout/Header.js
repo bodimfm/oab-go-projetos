@@ -27,24 +27,24 @@ export default function Header() {
   return (
     <header className="bg-white shadow-md">
       {/* Barra superior com contatos */}
-      <div className="bg-oab-red text-white py-1 text-sm">
-        <div className="container mx-auto px-4 flex justify-between items-center">
-          <div className="hidden md:flex items-center space-x-4">
-            <a href="tel:+556232382000" className="flex items-center hover:text-white">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div className="bg-oab-primary-dark text-white py-2 text-sm">
+        <div className="container mx-auto px-6 flex justify-between items-center">
+          <div className="hidden md:flex items-center space-x-6">
+            <a href="tel:+556232382000" className="flex items-center hover:text-gray-200 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
               </svg>
               <span>(62) 3238-2000</span>
             </a>
-            <a href="mailto:contato@oabgo.org.br" className="flex items-center hover:text-white">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <a href="mailto:contato@oabgo.org.br" className="flex items-center hover:text-gray-200 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
               <span>contato@oabgo.org.br</span>
             </a>
           </div>
           {isAuthenticated && (
-            <div className="text-xs">
+            <div className="text-sm">
               <span>Olá, {user?.nome_completo || 'Usuário'}</span>
             </div>
           )}
@@ -52,37 +52,37 @@ export default function Header() {
       </div>
       
       {/* Menu principal */}
-      <div className="container mx-auto px-4 py-3">
+      <div className="container mx-auto px-6 py-4">
         <div className="flex justify-between items-center">
           {/* Logo e Nome */}
-          <Link href="/" className="flex items-center space-x-3">
-            <div className="relative h-12 w-16 flex items-center justify-center bg-white">
+          <Link href="/" className="flex items-center space-x-4">
+            <div className="relative h-14 w-18 flex items-center justify-center bg-white rounded-lg">
               <img
                 src="/images/logo-oabgo.png"
                 alt="Logo OAB-GO"
-                width={64}
-                height={48}
+                width={72}
+                height={56}
                 className="object-contain"
               />
             </div>
             <div className="flex flex-col">
-              <span className="font-serif font-bold text-oab-red">OAB-GO</span>
-              <span className="text-oab-gray-600 text-sm">Sistema de Projetos das Comissões</span>
+              <span className="font-bold text-2xl text-oab-primary-dark">OAB GOIÁS</span>
+              <span className="text-oab-text-secondary text-sm">Sistema de Projetos das Comissões</span>
             </div>
           </Link>
 
           {/* Menu para Desktop */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link href="/" className={`hover:text-oab-red ${pathname === '/' ? 'text-oab-red font-medium' : 'text-oab-gray-700'}`}>
+            <Link href="/" className={`hover:text-oab-primary transition-colors font-medium ${pathname === '/' ? 'text-oab-primary' : 'text-oab-text-primary'}`}>
               Início
             </Link>
-            <Link href="/projetos" className={`hover:text-oab-red ${pathname.startsWith('/projetos') ? 'text-oab-red font-medium' : 'text-oab-gray-700'}`}>
+            <Link href="/projetos" className={`hover:text-oab-primary transition-colors font-medium ${pathname.startsWith('/projetos') ? 'text-oab-primary' : 'text-oab-text-primary'}`}>
               Projetos
             </Link>
-            <Link href="/membros" className={`hover:text-oab-red ${pathname.startsWith('/membros') ? 'text-oab-red font-medium' : 'text-oab-gray-700'}`}>
+            <Link href="/membros" className={`hover:text-oab-primary transition-colors font-medium ${pathname.startsWith('/membros') ? 'text-oab-primary' : 'text-oab-text-primary'}`}>
               Membros
             </Link>
-            <Link href="/buscar" className={`hover:text-oab-red ${pathname.startsWith('/buscar') ? 'text-oab-red font-medium' : 'text-oab-gray-700'}`}>
+            <Link href="/buscar" className={`hover:text-oab-primary transition-colors font-medium ${pathname.startsWith('/buscar') ? 'text-oab-primary' : 'text-oab-text-primary'}`}>
               Buscar
             </Link>
 
@@ -90,7 +90,7 @@ export default function Header() {
               <div className="relative ml-3">
                 <button
                   type="button"
-                  className="flex items-center space-x-2 text-oab-gray-700 hover:text-oab-red focus:outline-none"
+                  className="flex items-center space-x-2 text-oab-text-primary hover:text-oab-primary focus:outline-none transition-colors"
                   onClick={toggleMenu}
                   aria-expanded={menuOpen}
                   aria-haspopup="true"

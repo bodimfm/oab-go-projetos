@@ -11,10 +11,10 @@ export default function Layout({ children }) {
   const isFullWidth = fullWidthRoutes.includes(router.pathname);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-oab-background">
       <Header />
       
-      <main className={`flex-grow ${!isFullWidth ? 'container mx-auto px-4 py-8' : ''}`}>
+      <main className={`flex-grow ${!isFullWidth ? 'container mx-auto px-6 py-8' : ''}`}>
         {children}
       </main>
       
