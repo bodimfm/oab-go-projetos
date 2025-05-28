@@ -265,8 +265,6 @@ export default function DetalhesProjeto() {
           </section>
         </div>
       </div>
-
-      </div>
     </div>
   );
 }

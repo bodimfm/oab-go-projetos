@@ -55,19 +55,19 @@ export default function Header() {
       <div className="container mx-auto px-6 py-4">
         <div className="flex justify-between items-center">
           {/* Logo e Nome */}
-          <Link href="/" className="flex items-center space-x-4">
-            <div className="relative h-14 w-18 flex items-center justify-center bg-white rounded-lg">
+          <Link href="/" className="flex items-center space-x-6 group">
+            <div className="relative h-20 w-28 flex items-center justify-center bg-white rounded-xl shadow-lg border-2 border-oab-primary-dark p-2 transition-transform group-hover:scale-105">
               <img
                 src="/images/logo-oabgo.png"
                 alt="Logo OAB-GO"
-                width={72}
-                height={56}
-                className="object-contain"
+                width={110}
+                height={80}
+                className="object-contain drop-shadow-lg"
               />
             </div>
-            <div className="flex flex-col">
-              <span className="font-bold text-2xl text-oab-primary-dark">OAB GOIÁS</span>
-              <span className="text-oab-text-secondary text-sm">Sistema de Projetos das Comissões</span>
+            <div className="flex flex-col justify-center">
+              <span className="font-extrabold text-3xl text-oab-primary-dark tracking-wide leading-tight drop-shadow-sm">OAB GOIÁS</span>
+              <span className="text-oab-primary mt-1 text-base font-medium tracking-wide bg-oab-background px-2 py-0.5 rounded-md shadow-sm">Sistema de Gestão de Comissões</span>
             </div>
           </Link>
 
@@ -78,6 +78,9 @@ export default function Header() {
             </Link>
             <Link href="/projetos" className={`hover:text-oab-primary transition-colors font-medium ${pathname.startsWith('/projetos') ? 'text-oab-primary' : 'text-oab-text-primary'}`}>
               Projetos
+            </Link>
+            <Link href="/comissoes" className={`hover:text-oab-primary transition-colors font-medium ${pathname.startsWith('/comissoes') ? 'text-oab-primary' : 'text-oab-text-primary'}`}>
+              Comissões
             </Link>
             <Link href="/membros" className={`hover:text-oab-primary transition-colors font-medium ${pathname.startsWith('/membros') ? 'text-oab-primary' : 'text-oab-text-primary'}`}>
               Membros
@@ -210,6 +213,13 @@ export default function Header() {
                 onClick={() => setMenuOpen(false)}
               >
                 Projetos
+              </Link>
+              <Link
+                href="/comissoes"
+                className={`hover:text-oab-red ${pathname.startsWith('/comissoes') ? 'text-oab-red font-medium' : 'text-oab-gray-700'}`}
+                onClick={() => setMenuOpen(false)}
+              >
+                Comissões
               </Link>
               <Link
                 href="/membros"

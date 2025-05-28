@@ -9,6 +9,9 @@ export default function Projetos() {
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState(null);
   const [filtroStatus, setFiltroStatus] = useState('todos');
+  const [comissoes, setComissoes] = useState([]);
+  const [filtroComissao, setFiltroComissao] = useState('');
+  const [busca, setBusca] = useState('');
 
   useEffect(() => {
     const carregarProjetos = async () => {
@@ -23,13 +26,26 @@ export default function Projetos() {
         setLoading(false);
       }
     };
-
+    const carregarComissoes = async () => {
+      try {
+        const { data } = await api.getComissoes();
+        setComissoes(data);
+      } catch (error) {
+        console.error('Erro ao carregar comissões:', error);
+      }
+    };
     carregarProjetos();
+    carregarComissoes();
   }, []);
 
   const projetosFiltrados = projetos.filter(projeto => {
-    if (filtroStatus === 'todos') return true;
-    return projeto.status === filtroStatus;
+    // Filtro por status
+    if (filtroStatus !== 'todos' && projeto.status !== filtroStatus) return false;
+    // Filtro por comissão
+    if (filtroComissao && !projeto.comissoes.some(c => c.id === filtroComissao)) return false;
+    // Busca por nome
+    if (busca && !projeto.nome.toLowerCase().includes(busca.toLowerCase())) return false;
+    return true;
   });
 
   return (
@@ -56,6 +72,31 @@ export default function Projetos() {
         </div>
 
         <div className="card mb-8">
+          <div className="flex flex-col md:flex-row md:items-end md:space-x-8 gap-4 mb-4">
+            <div className="flex-1">
+              <label className="block text-oab-text-primary font-medium mb-1">Buscar por nome:</label>
+              <input
+                type="text"
+                value={busca}
+                onChange={e => setBusca(e.target.value)}
+                placeholder="Digite o nome do projeto..."
+                className="w-full px-4 py-2 border border-oab-border-light rounded-md focus:outline-none focus:ring-2 focus:ring-oab-primary"
+              />
+            </div>
+            <div className="flex-1">
+              <label className="block text-oab-text-primary font-medium mb-1">Filtrar por comissão:</label>
+              <select
+                value={filtroComissao}
+                onChange={e => setFiltroComissao(e.target.value)}
+                className="w-full px-4 py-2 border border-oab-border-light rounded-md focus:outline-none focus:ring-2 focus:ring-oab-primary"
+              >
+                <option value="">Todas as comissões</option>
+                {comissoes.map(comissao => (
+                  <option key={comissao.id} value={comissao.id}>{comissao.nome}</option>
+                ))}
+              </select>
+            </div>
+          </div>
           <div className="text-oab-text-primary mb-4 font-medium">Filtrar por status:</div>
           <div className="flex flex-wrap gap-3">
             <button
