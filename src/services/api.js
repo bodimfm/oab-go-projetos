@@ -145,6 +145,18 @@ export const api = {
     return { data };
   },
 
+  // Gerar sugestão de projeto usando modelo generativo
+  gerarSugestaoProjeto: async (ideia) => {
+    const response = await fetch('/api/ideia', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ideia })
+    });
+    if (!response.ok) throw new Error('Erro ao gerar sugestão');
+    const data = await response.json();
+    return { data: data.data };
+  },
+
   // Criar novo projeto
   criarProjeto: async (projeto) => {
     // Extrair dados do projeto e comissões relacionadas

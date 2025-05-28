@@ -8,8 +8,18 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'oab-red': '#C1272D', // Vermelho OAB
-        'oab-burgundy': '#8C1C21', // Vermelho mais escuro para hover
+        'oab': {
+          'primary-dark': '#0A3A52',
+          'primary': '#1E5A7D',
+          'background': '#F5F5F5',
+          'card-background': '#FFFFFF',
+          'text-primary': '#1A1A1A',
+          'text-secondary': '#666666',
+          'border-light': '#E0E0E0',
+        },
+        // Mantendo cores originais para compatibilidade
+        'oab-red': '#C1272D',
+        'oab-burgundy': '#8C1C21',
         'oab-gray': {
           100: '#f5f5f5',
           200: '#e5e5e5',
@@ -24,7 +34,7 @@ module.exports = {
       },
       fontFamily: {
         sans: [
-          '"Montserrat"',
+          '"Open Sans"',
           'ui-sans-serif',
           'system-ui',
           '-apple-system',
@@ -35,7 +45,18 @@ module.exports = {
           'Arial',
           'sans-serif',
         ],
-        serif: ['"Merriweather"', 'ui-serif', 'Georgia', 'Cambria', '"Times New Roman"', 'Times', 'serif'],
+        serif: ['"Open Sans"', 'ui-serif', 'Georgia', 'Cambria', '"Times New Roman"', 'Times', 'serif'],
+      },
+      spacing: {
+        '18': '4.5rem',
+        '88': '22rem',
+      },
+      boxShadow: {
+        'card': '0 2px 8px rgba(0, 0, 0, 0.08)',
+        'card-hover': '0 4px 16px rgba(0, 0, 0, 0.08)',
+      },
+      borderRadius: {
+        'card': '12px',
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",

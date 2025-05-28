@@ -13,8 +13,14 @@ export default function DetalhesProjeto() {
   const [loading, setLoading] = useState(true);
   const [loadingSugestoes, setLoadingSugestoes] = useState(true);
   const [erro, setErro] = useState(null);
+  const [pageUrl, setPageUrl] = useState('');
 
   useEffect(() => {
+    // Capturar a URL atual para compartilhamento
+    if (typeof window !== 'undefined') {
+      setPageUrl(window.location.href);
+    }
+
     const carregarProjeto = async () => {
       try {
         setLoading(true);
@@ -32,7 +38,14 @@ export default function DetalhesProjeto() {
       try {
         setLoadingSugestoes(true);
         const { data } = await api.getSugestoesIntegracao(params.id);
-        setSugestoes(data);
+        let extras = [];
+        if (typeof window !== 'undefined') {
+          const stored = localStorage.getItem(`sugestoesIntegracao_${params.id}`);
+          if (stored) {
+            try { extras = JSON.parse(stored); } catch (e) { extras = []; }
+          }
+        }
+        setSugestoes([...(extras || []), ...data]);
       } catch (error) {
         console.error('Erro ao carregar sugestões de integração:', error);
         // Não vamos mostrar erro para o usuário neste caso, apenas não mostraremos as sugestões

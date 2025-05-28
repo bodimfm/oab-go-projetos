@@ -29,37 +29,45 @@ export default function Login() {
       <Head>
         <title>Login | OAB-GO Projetos</title>
       </Head>
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="max-w-md w-full p-6 bg-white rounded-lg shadow-md">
+      <div className="min-h-screen flex items-center justify-center bg-oab-background">
+        <div className="max-w-md w-full card">
           <div className="text-center mb-8">
             <img 
               src="/images/logo-oabgo.png" 
               alt="OAB-GO" 
-              className="h-20 mx-auto mb-4"
+              className="h-20 mx-auto mb-6"
             />
-            <h2 className="text-2xl font-bold text-gray-800">
-              Sistema de Gerenciamento de Projetos
+            <h2 className="text-3xl font-bold text-oab-primary-dark mb-2">
+              OAB GOIÁS
             </h2>
-            <p className="text-sm text-gray-600 mt-2">
+            <h3 className="text-lg font-semibold text-oab-text-primary mb-2">
+              Sistema de Gerenciamento de Projetos
+            </h3>
+            <p className="text-sm text-oab-text-secondary">
               Acesse com seu nome de usuário e senha
             </p>
           </div>
           
           {formError && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-              <span className="block sm:inline">{formError}</span>
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg relative mb-6" role="alert">
+              <div className="flex items-center">
+                <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span className="block sm:inline">{formError}</span>
+              </div>
             </div>
           )}
           
-          <form onSubmit={handleSubmit}>
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="username">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label className="block text-oab-text-primary text-sm font-medium mb-2" htmlFor="username">
                 Nome de Usuário
               </label>
               <input
                 id="username"
                 type="text"
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                className="w-full px-4 py-3 border border-oab-border-light rounded-lg focus:outline-none focus:ring-2 focus:ring-oab-primary focus:border-transparent transition-colors"
                 placeholder="Nome da comissão (sem espaços)"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
@@ -67,14 +75,14 @@ export default function Login() {
               />
             </div>
             
-            <div className="mb-6">
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
+            <div>
+              <label className="block text-oab-text-primary text-sm font-medium mb-2" htmlFor="password">
                 Senha
               </label>
               <input
                 id="password"
                 type="password"
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                className="w-full px-4 py-3 border border-oab-border-light rounded-lg focus:outline-none focus:ring-2 focus:ring-oab-primary focus:border-transparent transition-colors"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
